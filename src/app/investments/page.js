@@ -114,7 +114,6 @@ export default function InvestmentsPage() {
   };
 
   const handleDeleteWorksheet = (idToDelete) => {
-    // --- ITT A JAVÍTÁS ---
     if (
       !window.confirm(
         'Biztosan törlöd ezt a munkalapot? A hozzá tartozó ÖSSZES adat véglegesen törlődni fog!'
@@ -134,7 +133,6 @@ export default function InvestmentsPage() {
   };
 
   const handleDeleteAssetType = (idToDelete) => {
-    // --- ITT A JAVÍTÁS ---
     if (
       !window.confirm(
         'Biztosan törlöd ezt az eszközt? A hozzá tartozó összes adat véglegesen törlődni fog!'
@@ -267,8 +265,7 @@ export default function InvestmentsPage() {
           </Grid>
         ) : (
           <p>
-            Nincs megjeleníthető munkalap. Hozz létre egyet a 'Munkalapok
-            Kezelése' gombbal!
+            {'Nincs megjeleníthető munkalap. Hozz létre egyet a "Munkalapok Kezelése" gombbal!'}
           </p>
         )}
 
