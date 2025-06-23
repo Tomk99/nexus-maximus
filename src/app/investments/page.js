@@ -267,8 +267,8 @@ export default function InvestmentsPage() {
           </Grid>
         ) : (
           <p>
-            Nincs megjeleníthető munkalap. Hozz létre egyet a "Munkalapok
-            Kezelése" gombbal!
+            Nincs megjeleníthető munkalap. Hozz létre egyet a 'Munkalapok
+            Kezelése' gombbal!
           </p>
         )}
 
