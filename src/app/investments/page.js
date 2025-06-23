@@ -90,7 +90,6 @@ export default function InvestmentsPage() {
     handleUpdateItem: handleUpdateAssetType,
   } = useCrud(activeAssetTypeService);
 
-  // --- ITT A JAVÍTÁS: A teljes CRUD hook-ot használjuk ---
   const {
     items: investments,
     setItems: setInvestments,
@@ -122,7 +121,6 @@ export default function InvestmentsPage() {
     )
       return;
 
-    // A backend már kezeli a kaszkádolt törlést, így elég a worksheet-et törölni
     worksheetService.delete(idToDelete).then(() => {
       const updatedList = worksheets.filter((ws) => ws.id !== idToDelete);
       setWorksheets(updatedList);
@@ -142,9 +140,7 @@ export default function InvestmentsPage() {
     ) {
       return;
     }
-    // A backend kezeli a kaszkádolt törlést
     activeAssetTypeService.delete(idToDelete).then(() => {
-      // Újra lekérjük az adatokat, hogy a UI frissüljön
       activeAssetTypeService.get().then(setAssetTypes);
       activeInvestmentService.get().then(setInvestments);
     });
@@ -248,9 +244,10 @@ export default function InvestmentsPage() {
                           </ActionButton>
                           <ActionButton
                             onClick={() => {
+                              // --- ITT A JAVÍTÁS: Aposztrófok használata ---
                               if (
                                 window.confirm(
-                                  "Biztosan törlöd ezt a napi bejegyzést?"
+                                  'Biztosan törlöd ezt a napi bejegyzést?'
                                 )
                               ) {
                                 handleDeleteInvestment(snapshot.id);
