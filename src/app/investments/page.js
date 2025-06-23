@@ -114,9 +114,10 @@ export default function InvestmentsPage() {
   };
 
   const handleDeleteWorksheet = (idToDelete) => {
+    // --- ITT A JAVÍTÁS ---
     if (
       !window.confirm(
-        "Biztosan törlöd ezt a munkalapot? A hozzá tartozó ÖSSZES adat véglegesen törlődni fog!"
+        'Biztosan törlöd ezt a munkalapot? A hozzá tartozó ÖSSZES adat véglegesen törlődni fog!'
       )
     )
       return;
@@ -133,9 +134,10 @@ export default function InvestmentsPage() {
   };
 
   const handleDeleteAssetType = (idToDelete) => {
+    // --- ITT A JAVÍTÁS ---
     if (
       !window.confirm(
-        "Biztosan törlöd ezt az eszközt? A hozzá tartozó összes adat véglegesen törlődni fog!"
+        'Biztosan törlöd ezt az eszközt? A hozzá tartozó összes adat véglegesen törlődni fog!'
       )
     ) {
       return;
@@ -244,7 +246,6 @@ export default function InvestmentsPage() {
                           </ActionButton>
                           <ActionButton
                             onClick={() => {
-                              // --- ITT A JAVÍTÁS: Aposztrófok használata ---
                               if (
                                 window.confirm(
                                   'Biztosan törlöd ezt a napi bejegyzést?'
