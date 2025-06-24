@@ -29,10 +29,8 @@ export function InvestmentForm({
   useEffect(() => {
     if (editingSnapshot) {
       setDate(new Date(editingSnapshot.date));
-      // --- ITT A JAVÍTÁS: Az értékeket egy objektumba töltjük, ahol a kulcs az asset ID ---
       const initialValues = {};
       editingSnapshot.assets.forEach((asset) => {
-        // A backend az assetTypeId-t adja, de a mi logikánk az asset.id-t használja
         initialValues[asset.assetTypeId] = asset.value;
       });
       setValues(initialValues);
@@ -42,6 +40,11 @@ export function InvestmentForm({
     }
   }, [editingSnapshot]);
 
+  // --- ITT A JAVÍTÁS: A hiányzó függvény visszaállítása ---
+  const handleValueChange = (assetId, value) => {
+    setValues((prev) => ({ ...prev, [assetId]: value }));
+  };
+
   const formatDateForStorage = (dateObj) => {
     return dateObj.toISOString().split("T")[0];
   };
@@ -49,7 +52,7 @@ export function InvestmentForm({
   const handleSubmit = (e) => {
     e.preventDefault();
     const assetsForStorage = assetTypes.map((asset) => ({
-      assetTypeId: asset.id, // A backend az assetTypeId-t várja
+      assetTypeId: asset.id,
       name: asset.name,
       color: asset.color,
       value: values[asset.id] ? parseFloat(values[asset.id]) : 0,
