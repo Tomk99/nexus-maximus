@@ -1,4 +1,5 @@
 import { createGlobalStyle } from "styled-components";
+import Head from "next/head";
 import { BackButton } from "@/components/BackButton";
 
 const GlobalStyle = createGlobalStyle`
@@ -9,6 +10,7 @@ const GlobalStyle = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #111827;
+    color: #e5e7eb; /* Hozzáadtam egy alapértelmezett szövegszínt */
   }
 
   * {
@@ -66,6 +68,15 @@ const GlobalStyle = createGlobalStyle`
 function MyApp({ Component, pageProps }) {
   return (
     <>
+      <Head>
+        <title>Nexus Maximus</title>
+        <meta
+          name="description"
+          content="Személyes menedzsment alkalmazás"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      
       <GlobalStyle />
       <BackButton />
       <Component {...pageProps} />

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { refuelingService, maintenanceService } from "@/services/storageService";
+import { refuelingService } from "@/services/refuelingService";
+import { maintenanceService } from "@/services/maintenanceService";
 import { useCrud } from "@/hooks/useCrud";
 import { ConsumptionChart } from "@/components/ConsumptionChart";
 import { RefuelingForm } from "@/components/RefuelingForm";
