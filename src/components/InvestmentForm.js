@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import DatePicker from "react-datepicker";
+import DatePicker, { registerLocale } from "react-datepicker";
+import hu from "date-fns/locale/hu";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   FormContainer,
@@ -10,8 +11,10 @@ import {
   Input,
   DatePickerWrapper,
   PrimaryButton,
-  SecondaryButton, // Importáljuk a másodlagos gombot
+  SecondaryButton,
 } from "./FormElements";
+
+registerLocale("hu", hu);
 
 export function InvestmentForm({
   assetTypes,
@@ -25,36 +28,35 @@ export function InvestmentForm({
 
   useEffect(() => {
     if (editingSnapshot) {
-      // Szerkesztési mód: töltsük be az adatokat
       setDate(new Date(editingSnapshot.date));
-      // Az értékeket egy objektumba töltjük, ahol a kulcs az asset ID
+      // --- ITT A JAVÍTÁS: Az értékeket egy objektumba töltjük, ahol a kulcs az asset ID ---
       const initialValues = {};
       editingSnapshot.assets.forEach((asset) => {
-        initialValues[asset.id] = asset.value;
+        // A backend az assetTypeId-t adja, de a mi logikánk az asset.id-t használja
+        initialValues[asset.assetTypeId] = asset.value;
       });
       setValues(initialValues);
     } else {
-      // Hozzáadás mód: ürítsük az űrlapot
       setDate(new Date());
       setValues({});
     }
   }, [editingSnapshot]);
 
-  const handleValueChange = (assetId, value) => {
-    setValues((prev) => ({ ...prev, [assetId]: value }));
+  const formatDateForStorage = (dateObj) => {
+    return dateObj.toISOString().split("T")[0];
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const assetsForStorage = assetTypes.map((asset) => ({
-      id: asset.id,
+      assetTypeId: asset.id, // A backend az assetTypeId-t várja
       name: asset.name,
       color: asset.color,
       value: values[asset.id] ? parseFloat(values[asset.id]) : 0,
     }));
 
     const submissionData = {
-      date: date.toISOString().split("T")[0],
+      date: formatDateForStorage(date),
       assets: assetsForStorage,
     };
 

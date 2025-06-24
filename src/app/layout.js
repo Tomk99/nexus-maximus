@@ -1,5 +1,6 @@
+import "@/lib/datepicker-locale";
 import StyledComponentsRegistry from "@/lib/registry";
-import { BackButton } from "@/components/BackButton"; // Importáljuk az új komponenst
+import { BackButton } from "@/components/BackButton";
 import "./globals.css";
 
 export const metadata = {
@@ -12,7 +13,7 @@ export default function RootLayout({ children }) {
     <html lang="hu">
       <body>
         <StyledComponentsRegistry>
-          <BackButton /> {/* Itt hívjuk meg a gombot */}
+          <BackButton />
           {children}
         </StyledComponentsRegistry>
       </body>

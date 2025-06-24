@@ -21,7 +21,6 @@ export function RefuelingForm({
   onUpdate,
   editingRefueling,
   onCancelEdit,
-  // --- ÚJ PROPOK ---
   onCalendarOpen,
   onCalendarClose,
 }) {
@@ -80,8 +79,8 @@ export function RefuelingForm({
             customInput={<Input />}
             popperPlacement="bottom-start"
             locale="hu"
-            onCalendarOpen={onCalendarOpen} // <-- ITT A JAVÍTÁS
-            onCalendarClose={onCalendarClose} // <-- ITT A JAVÍTÁS
+            onCalendarOpen={onCalendarOpen}
+            onCalendarClose={onCalendarClose}
           />
         </DatePickerWrapper>
       </FormGroup>
