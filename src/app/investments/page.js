@@ -28,7 +28,33 @@ import {
   DateColumn,
 } from "@/components/ListElements";
 
-// ... a styled komponensek (Header, WorksheetSelector, stb.) változatlanok ...
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+`;
+
+const WorksheetSelector = styled.select`
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #374151;
+  border: 1px solid #4b5563;
+  color: #f3f4f6;
+  font-size: 16px;
+`;
+
+const SnapshotListItem = styled(ListItem)`
+  align-items: center;
+`;
+
+const TotalValue = styled.span`
+  font-weight: 600;
+  color: white;
+  flex-grow: 1;
+  text-align: right;
+  margin-right: 24px;
+`;
 
 export default function InvestmentsPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -36,9 +62,9 @@ export default function InvestmentsPage() {
   const [isManagerOpen, setIsManagerOpen] = useState(false);
   const [editingColorForAssetId, setEditingColorForAssetId] = useState(null);
 
-  // A worksheet-eket külön kezeljük, mert ez a fő vezérlő állapot
   const {
     items: worksheets,
+    setItems: setWorksheets,
     handleAddItem: handleAddWorksheet,
     handleUpdateItem: handleUpdateWorksheet,
     handleDeleteItem: handleDeleteWorksheetInternal,
@@ -80,7 +106,14 @@ export default function InvestmentsPage() {
   } = useCrud(activeInvestmentService);
 
   const handleAddWorksheetAndClose = (data) => {
-    handleAddWorksheet(data);
+    handleAddWorksheet(data).then((newList) => {
+      worksheetService.get().then(list => {
+        setWorksheets(list);
+        if (list.length > 0) {
+            setActiveWorksheetId(list[list.length - 1].id);
+        }
+      });
+    });
     setIsManagerOpen(false);
   };
 
@@ -94,8 +127,8 @@ export default function InvestmentsPage() {
     
     handleDeleteWorksheetInternal(idToDelete);
     if (activeWorksheetId === idToDelete) {
-      // A useCrud useEffect-je majd beállítja a következőt, ha van
-      setActiveWorksheetId(null);
+      const remainingWorksheets = worksheets.filter(ws => ws.id !== idToDelete);
+      setActiveWorksheetId(remainingWorksheets.length > 0 ? remainingWorksheets[0].id : null);
     }
   };
 
@@ -130,7 +163,91 @@ export default function InvestmentsPage() {
 
         {activeWorksheetId ? (
           <Grid>
-            {/* ... a JSX többi része változatlan ... */}
+            <Column $span={1}>
+              <Card $isActive={!!editingColorForAssetId}>
+                <AssetManager
+                  assetTypes={assetTypes}
+                  onAdd={handleAddAssetType}
+                  onUpdate={handleUpdateAssetType}
+                  onDelete={handleDeleteAssetType}
+                  editingColorForAssetId={editingColorForAssetId}
+                  onToggleColorPicker={setEditingColorForAssetId}
+                />
+              </Card>
+              <Card>
+                <InvestmentForm
+                  assetTypes={assetTypes}
+                  onAdd={handleAddInvestment}
+                  onUpdate={handleUpdateInvestment}
+                  editingSnapshot={investmentToEdit}
+                  onCancelEdit={handleCancelEditInvestment}
+                />
+              </Card>
+            </Column>
+            <Column $span={2}>
+              <Card>
+                <div style={{ height: "500px" }}>
+                  <InvestmentChart
+                    data={investments}
+                    assetTypes={assetTypes}
+                  />
+                </div>
+              </Card>
+              <Card>
+                <h2
+                  style={{
+                    color: "white",
+                    fontSize: "24px",
+                    fontWeight: 600,
+                    marginBottom: "16px",
+                  }}
+                >
+                  Napi Portfólió Adatok
+                </h2>
+                <List>
+                  {investments.map((snapshot) => {
+                    const total = snapshot.assets.reduce(
+                      (sum, asset) => sum + asset.value,
+                      0
+                    );
+                    return (
+                      <SnapshotListItem key={snapshot.id}>
+                        <DateColumn>
+                          <p>
+                            {new Date(snapshot.date).toLocaleDateString(
+                              "hu-HU"
+                            )}
+                          </p>
+                        </DateColumn>
+                        <TotalValue>
+                          {new Intl.NumberFormat("hu-HU").format(total)}
+                        </TotalValue>
+                        <ActionButtons>
+                          <ActionButton
+                            onClick={() => handleStartEditInvestment(snapshot)}
+                          >
+                            Szerkeszt
+                          </ActionButton>
+                          <ActionButton
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  'Biztosan törlöd ezt a napi bejegyzést?'
+                                )
+                              ) {
+                                handleDeleteInvestment(snapshot.id);
+                              }
+                            }}
+                          >
+                            Töröl
+                          </ActionButton>
+                        </ActionButtons>
+                      </SnapshotListItem>
+                    );
+                  })}
+                </List>
+              </Card>
+            </Column>
           </Grid>
         ) : (
           <p>
