@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 import { Card } from "@/components/Card";
-import { PageWrapper, Container, Title } from "@/components/Layout";
+import { Container, Title } from "@/components/Layout";
 
 const ModuleGrid = styled.div`
   display: grid;
@@ -44,12 +44,13 @@ export default function HomePage() {
     setIsMounted(true);
   }, []);
 
+  // A hydration hibák elkerülése érdekében csak akkor renderelünk, ha a kliensoldalon vagyunk.
   if (!isMounted) {
     return null;
   }
 
   return (
-    <PageWrapper>
+    <main style={{ padding: "32px" }}>
       <Container>
         <Title>Nexus Maximus</Title>
         <ModuleGrid>
@@ -72,6 +73,6 @@ export default function HomePage() {
           </ModuleLink>
         </ModuleGrid>
       </Container>
-    </PageWrapper>
+    </main>
   );
 }
