@@ -1,25 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
 
 export const useCrud = (service) => {
-  // --- ITT A JAVÍTÁS: A kezdeti állapot mindig egy üres tömb ---
   const [items, setItems] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const updateStateWithList = (list) => {
+  const updateStateWithList = useCallback((list) => {
     if (Array.isArray(list)) {
       if (list.length > 0 && list[0].date) {
         list.sort((a, b) => new Date(b.date) - new Date(a.date));
       }
       setItems(list);
     } else {
-      // Ha a service nem listát ad vissza (pl. egyetlen objektumot), akkor is kezeljük
-      setItems(prevItems => prevItems.map(item => item.id === list.id ? list : item));
+      // Ha a service nem listát ad vissza, ne csináljunk semmit, vagy logoljuk
+      console.warn("updateStateWithList did not receive an array:", list);
     }
-  };
+  }, []);
 
-  // --- ITT A JAVÍTÁS: useCallback a felesleges újrafuttatás elkerülésére ---
   const fetchItems = useCallback(async () => {
     if (!service) {
       setIsLoading(false);
@@ -29,37 +27,37 @@ export const useCrud = (service) => {
       setIsLoading(true);
       setError(null);
       const data = await service.get();
-      // Biztosítjuk, hogy mindig tömbbel dolgozzunk
-      setItems(Array.isArray(data) ? data : []);
+      updateStateWithList(data || []);
     } catch (err) {
       console.error("Failed to fetch items:", err);
       setError(err.message);
-      setItems([]); // Hiba esetén is üres tömböt állítunk be
+      setItems([]);
     } finally {
       setIsLoading(false);
     }
-  }, [service]);
+  }, [service, updateStateWithList]);
 
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
 
   const handleAddItem = async (data) => {
-    const newItem = await service.add(data);
-    // A backend általában a létrehozott elemet adja vissza, ezt hozzáadjuk a listához
-    setItems(prevItems => [newItem, ...prevItems]);
-    await fetchItems(); // Vagy egyszerűen újra lekérjük a teljes listát
+    const updatedList = await service.add(data);
+    updateStateWithList(updatedList);
   };
 
   const handleUpdateItem = async (data) => {
-    await service.update(data);
+    const updatedList = await service.update(data);
+    // A backend általában a frissített elemet adja vissza, nem a teljes listát.
+    // Ezért a biztonság kedvéért újra lekérjük a teljes listát.
+    await fetchItems();
     setEditingId(null);
-    await fetchItems(); // Frissítjük a listát
   };
 
   const handleDeleteItem = async (id) => {
     await service.delete(id);
-    await fetchItems(); // Frissítjük a listát
+    // Törlés után a lista biztosan megváltozott, ezért újra lekérjük.
+    await fetchItems();
   };
 
   const handleStartEdit = (item) => {
