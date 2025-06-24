@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { worksheetService } from "@/services/worksheetService";
@@ -13,7 +11,6 @@ import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
 import { WorksheetManager } from "@/components/WorksheetManager";
 import {
-  PageWrapper,
   Container,
   Title,
   Grid,
@@ -90,13 +87,14 @@ export default function InvestmentsPage() {
 
   const {
     items: assetTypes,
+    setItems: setAssetTypes,
     handleAddItem: handleAddAssetType,
     handleUpdateItem: handleUpdateAssetType,
-    handleDeleteItem: handleDeleteAssetType,
   } = useCrud(activeAssetTypeService);
 
   const {
     items: investments,
+    setItems: setInvestments,
     itemToEdit: investmentToEdit,
     handleAddItem: handleAddInvestment,
     handleUpdateItem: handleUpdateInvestment,
@@ -106,11 +104,11 @@ export default function InvestmentsPage() {
   } = useCrud(activeInvestmentService);
 
   const handleAddWorksheetAndClose = (data) => {
-    handleAddWorksheet(data).then((newList) => {
-      worksheetService.get().then(list => {
+    handleAddWorksheet(data).then(() => {
+      worksheetService.get().then((list) => {
         setWorksheets(list);
         if (list.length > 0) {
-            setActiveWorksheetId(list[list.length - 1].id);
+          setActiveWorksheetId(list[list.length - 1].id);
         }
       });
     });
@@ -120,16 +118,32 @@ export default function InvestmentsPage() {
   const handleDeleteWorksheet = (idToDelete) => {
     if (
       !window.confirm(
-        'Biztosan törlöd ezt a munkalapot? A hozzá tartozó ÖSSZES adat véglegesen törlődni fog!'
+        "Biztosan törlöd ezt a munkalapot? A hozzá tartozó ÖSSZES adat véglegesen törlődni fog!"
       )
     )
       return;
-    
+
     handleDeleteWorksheetInternal(idToDelete);
     if (activeWorksheetId === idToDelete) {
-      const remainingWorksheets = worksheets.filter(ws => ws.id !== idToDelete);
-      setActiveWorksheetId(remainingWorksheets.length > 0 ? remainingWorksheets[0].id : null);
+      const remainingWorksheets = worksheets.filter((ws) => ws.id !== idToDelete);
+      setActiveWorksheetId(
+        remainingWorksheets.length > 0 ? remainingWorksheets[0].id : null
+      );
     }
+  };
+
+  const handleDeleteAssetType = (idToDelete) => {
+    if (
+      !window.confirm(
+        "Biztosan törlöd ezt az eszközt? A hozzá tartozó összes adat véglegesen törlődni fog!"
+      )
+    ) {
+      return;
+    }
+    activeAssetTypeService.delete(idToDelete).then(() => {
+      activeAssetTypeService.get().then(setAssetTypes);
+      activeInvestmentService.get().then(setInvestments);
+    });
   };
 
   if (!isMounted) {
@@ -137,7 +151,7 @@ export default function InvestmentsPage() {
   }
 
   return (
-    <PageWrapper>
+    <main style={{ padding: "32px" }}>
       <Container>
         <Header>
           <Title style={{ marginBottom: 0 }}>Befektetések</Title>
@@ -232,7 +246,7 @@ export default function InvestmentsPage() {
                             onClick={() => {
                               if (
                                 window.confirm(
-                                  'Biztosan törlöd ezt a napi bejegyzést?'
+                                  "Biztosan törlöd ezt a napi bejegyzést?"
                                 )
                               ) {
                                 handleDeleteInvestment(snapshot.id);
@@ -251,7 +265,7 @@ export default function InvestmentsPage() {
           </Grid>
         ) : (
           <p>
-            {'Nincs megjeleníthető munkalap. Hozz létre egyet a "Munkalapok Kezelése" gombbal!'}
+            {"Nincs megjeleníthető munkalap. Hozz létre egyet a 'Munkalapok Kezelése' gombbal!"}
           </p>
         )}
 
@@ -264,6 +278,6 @@ export default function InvestmentsPage() {
           />
         </Modal>
       </Container>
-    </PageWrapper>
+    </main>
   );
 }

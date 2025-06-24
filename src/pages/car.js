@@ -1,15 +1,11 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import { refuelingService } from "@/services/refuelingService";
-import { maintenanceService } from "@/services/maintenanceService";
+import { refuelingService, maintenanceService } from "@/services/storageService";
 import { useCrud } from "@/hooks/useCrud";
 import { ConsumptionChart } from "@/components/ConsumptionChart";
 import { RefuelingForm } from "@/components/RefuelingForm";
 import { MaintenanceForm } from "@/components/MaintenanceForm";
 import { Card } from "@/components/Card";
 import {
-  PageWrapper,
   Container,
   Title,
   Grid,
@@ -58,7 +54,7 @@ export default function CarPage() {
   }
 
   return (
-    <PageWrapper>
+    <main style={{ padding: "32px" }}>
       <Container>
         <Title>Autó Nyilvántartó</Title>
         <Grid>
@@ -191,6 +187,6 @@ export default function CarPage() {
           </Column>
         </Grid>
       </Container>
-    </PageWrapper>
+    </main>
   );
 }
