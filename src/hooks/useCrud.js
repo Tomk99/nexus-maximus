@@ -41,13 +41,20 @@ export const useCrud = (service) => {
   }, [fetchItems]);
 
   const handleAddItem = async (data) => {
-    const updatedList = await service.add(data);
-    updateStateWithList(updatedList);
+    const newItem = await service.add(data);
+    if (newItem) {
+      updateStateWithList([newItem, ...items]);
+    }
   };
 
   const handleUpdateItem = async (data) => {
-    const updatedList = await service.update(data);
-    await fetchItems();
+    const updatedItem = await service.update(data);
+    if (updatedItem) {
+      const updatedList = items.map((item) =>
+        item.id === updatedItem.id ? updatedItem : item
+      );
+      updateStateWithList(updatedList);
+    }
     setEditingId(null);
   };
 
@@ -60,7 +67,7 @@ export const useCrud = (service) => {
     setEditingId(item.id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  
+
   const handleCancelEdit = () => setEditingId(null);
 
   const itemToEdit = editingId ? items.find((i) => i.id === editingId) : null;

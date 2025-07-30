@@ -10,14 +10,13 @@ const GlobalStyle = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #111827;
-    color: #e5e7eb; /* Hozzáadtam egy alapértelmezett szövegszínt */
+    color: #e5e7eb;
   }
 
   * {
     box-sizing: border-box;
   }
 
-  /* React Datepicker Dark Theme Override */
   .react-datepicker {
     font-family: inherit;
     font-size: 0.8rem;
