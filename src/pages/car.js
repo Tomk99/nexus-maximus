@@ -6,12 +6,7 @@ import { ConsumptionChart } from "@/components/ConsumptionChart";
 import { RefuelingForm } from "@/components/RefuelingForm";
 import { MaintenanceForm } from "@/components/MaintenanceForm";
 import { Card } from "@/components/Card";
-import {
-  Container,
-  Title,
-  Grid,
-  Column,
-} from "@/components/Layout";
+import { Container, Title, Grid, Column } from "@/components/Layout";
 import {
   List,
   ListItem,
@@ -21,6 +16,8 @@ import {
   DateColumn,
   Description,
 } from "@/components/ListElements";
+import API_URL from "@/config";
+import { PrimaryButton } from "@/components/FormElements";
 
 export default function CarPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -50,6 +47,10 @@ export default function CarPage() {
     handleCancelEdit: handleCancelEditMaintenance,
   } = useCrud(maintenanceService);
 
+  const handleExport = () => {
+    window.location.href = `${API_URL}/car/export/csv`;
+  };
+
   if (!isMounted) {
     return null;
   }
@@ -57,7 +58,27 @@ export default function CarPage() {
   return (
     <main style={{ padding: "32px" }}>
       <Container>
-        <Title>Autó Nyilvántartó</Title>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            marginBottom: "32px",
+          }}
+        >
+          <Title style={{ marginBottom: 0 }}>Autó Nyilvántartó</Title>
+          <PrimaryButton
+            onClick={handleExport}
+            style={{
+              marginLeft: "auto",
+              padding: "6px",
+              fontSize: "14px",
+              maxWidth: "20%",
+            }}
+          >
+            Export (CSV)
+          </PrimaryButton>
+        </div>
+
         <Grid>
           <Column $span={1}>
             <Card $isActive={activeCalendar === "refueling"}>
@@ -117,9 +138,7 @@ export default function CarPage() {
                     </DateColumn>
                     <ActionButtons>
                       <Badge>{r.liters.toFixed(2)} L</Badge>
-                      <ActionButton
-                        onClick={() => handleStartEditRefueling(r)}
-                      >
+                      <ActionButton onClick={() => handleStartEditRefueling(r)}>
                         Szerkeszt
                       </ActionButton>
                       <ActionButton
