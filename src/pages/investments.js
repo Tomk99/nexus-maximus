@@ -10,12 +10,7 @@ import { AssetManager } from "@/components/AssetManager";
 import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
 import { WorksheetManager } from "@/components/WorksheetManager";
-import {
-  Container,
-  Title,
-  Grid,
-  Column,
-} from "@/components/Layout";
+import { Container, Title, Grid, Column } from "@/components/Layout";
 import { PrimaryButton } from "@/components/FormElements";
 import {
   List,
@@ -24,6 +19,7 @@ import {
   ActionButtons,
   DateColumn,
 } from "@/components/ListElements";
+import API_URL from "@/config";
 
 const Header = styled.div`
   display: flex;
@@ -75,8 +71,7 @@ export default function InvestmentsPage() {
   }, [worksheets, activeWorksheetId]);
 
   const activeInvestmentService = useMemo(
-    () =>
-      activeWorksheetId ? getInvestmentService(activeWorksheetId) : null,
+    () => (activeWorksheetId ? getInvestmentService(activeWorksheetId) : null),
     [activeWorksheetId]
   );
 
@@ -125,7 +120,9 @@ export default function InvestmentsPage() {
 
     handleDeleteWorksheetInternal(idToDelete);
     if (activeWorksheetId === idToDelete) {
-      const remainingWorksheets = worksheets.filter((ws) => ws.id !== idToDelete);
+      const remainingWorksheets = worksheets.filter(
+        (ws) => ws.id !== idToDelete
+      );
       setActiveWorksheetId(
         remainingWorksheets.length > 0 ? remainingWorksheets[0].id : null
       );
@@ -146,6 +143,10 @@ export default function InvestmentsPage() {
     });
   };
 
+  const handleExport = () => {
+    window.location.href = `${API_URL}/investments/export/csv`;
+  };
+
   if (!isMounted) {
     return null;
   }
@@ -153,26 +154,45 @@ export default function InvestmentsPage() {
   return (
     <main style={{ padding: "32px" }}>
       <Container>
-        <Header>
+        <Header style={{ alignItems: "center" }}>
           <Title style={{ marginBottom: 0 }}>Befektetések</Title>
-          {worksheets.length > 0 && (
-            <WorksheetSelector
-              value={activeWorksheetId || ""}
-              onChange={(e) => setActiveWorksheetId(e.target.value)}
-            >
-              {worksheets.map((ws) => (
-                <option key={ws.id} value={ws.id}>
-                  {ws.name}
-                </option>
-              ))}
-            </WorksheetSelector>
-          )}
-          <PrimaryButton
-            onClick={() => setIsManagerOpen(true)}
-            style={{ flexGrow: 0 }}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+              marginLeft: "auto",
+            }}
           >
-            Munkalapok Kezelése
-          </PrimaryButton>
+            {worksheets.length > 0 && (
+              <WorksheetSelector
+                value={activeWorksheetId || ""}
+                onChange={(e) => setActiveWorksheetId(e.target.value)}
+              >
+                {worksheets.map((ws) => (
+                  <option key={ws.id} value={ws.id}>
+                    {ws.name}
+                  </option>
+                ))}
+              </WorksheetSelector>
+            )}
+            <PrimaryButton
+              onClick={() => setIsManagerOpen(true)}
+              style={{ flexShrink: 0 }}
+            >
+              Munkalapok Kezelése
+            </PrimaryButton>
+            <PrimaryButton
+              onClick={handleExport}
+              style={{
+                padding: "8px 16px",
+                fontSize: "14px",
+                flexShrink: 0,
+              }}
+            >
+              Export (CSV)
+            </PrimaryButton>
+          </div>
         </Header>
 
         {activeWorksheetId ? (
@@ -201,10 +221,7 @@ export default function InvestmentsPage() {
             <Column $span={2}>
               <Card>
                 <div style={{ height: "500px" }}>
-                  <InvestmentChart
-                    data={investments}
-                    assetTypes={assetTypes}
-                  />
+                  <InvestmentChart data={investments} assetTypes={assetTypes} />
                 </div>
               </Card>
               <Card>
@@ -265,7 +282,9 @@ export default function InvestmentsPage() {
           </Grid>
         ) : (
           <p>
-            {"Nincs megjeleníthető munkalap. Hozz létre egyet a 'Munkalapok Kezelése' gombbal!"}
+            {
+              "Nincs megjeleníthető munkalap. Hozz létre egyet a 'Munkalapok Kezelése' gombbal!"
+            }
           </p>
         )}
 
