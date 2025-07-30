@@ -34,31 +34,37 @@ export function RefuelingForm({
       setOdometer(editingRefueling.odometer);
       setLiters(editingRefueling.liters);
     } else {
-      setDate(new Date());
-      setOdometer("");
-      setLiters("");
+      resetForm();
     }
   }, [editingRefueling]);
 
-  const formatDateForStorage = (dateObj) => {
-    return dateObj.toISOString().split("T")[0];
+  const resetForm = () => {
+    setDate(new Date());
+    setOdometer("");
+    setLiters("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!date || !odometer || !liters) {
       alert("Minden mező kitöltése kötelező!");
       return;
     }
     const submissionData = {
-      date: formatDateForStorage(date),
+      date: date.toISOString().split("T")[0],
       odometer: parseInt(odometer),
       liters: parseFloat(liters),
     };
-    if (editingRefueling) {
-      onUpdate({ ...submissionData, id: editingRefueling.id });
-    } else {
-      onAdd(submissionData);
+
+    try {
+      if (editingRefueling) {
+        await onUpdate({ ...submissionData, id: editingRefueling.id });
+      } else {
+        await onAdd(submissionData);
+        resetForm();
+      }
+    } catch (error) {
+      console.error("Refueling submission failed:", error);
     }
   };
 

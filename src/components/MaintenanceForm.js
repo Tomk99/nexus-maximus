@@ -35,31 +35,37 @@ export function MaintenanceForm({
       setOdometer(editingMaintenance.odometer || "");
       setDescription(editingMaintenance.description);
     } else {
-      setDate(new Date());
-      setOdometer("");
-      setDescription("");
+      resetForm();
     }
   }, [editingMaintenance]);
 
-  const formatDateForStorage = (dateObj) => {
-    return dateObj.toISOString().split("T")[0];
+  const resetForm = () => {
+    setDate(new Date());
+    setOdometer("");
+    setDescription("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!date || !description) {
       alert("A dátum és a leírás kitöltése kötelező!");
       return;
     }
     const submissionData = {
-      date: formatDateForStorage(date),
+      date: date.toISOString().split("T")[0],
       odometer: odometer ? parseInt(odometer) : null,
       description,
     };
-    if (editingMaintenance) {
-      onUpdate({ ...submissionData, id: editingMaintenance.id });
-    } else {
-      onAdd(submissionData);
+
+    try {
+      if (editingMaintenance) {
+        await onUpdate({ ...submissionData, id: editingMaintenance.id });
+      } else {
+        await onAdd(submissionData);
+        resetForm();
+      }
+    } catch (error) {
+      console.error("Maintenance submission failed:", error);
     }
   };
 

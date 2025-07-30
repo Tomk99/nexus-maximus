@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import toast from "react-hot-toast";
 
 export const useCrud = (service) => {
   const [items, setItems] = useState([]);
@@ -41,26 +42,43 @@ export const useCrud = (service) => {
   }, [fetchItems]);
 
   const handleAddItem = async (data) => {
-    const newItem = await service.add(data);
-    if (newItem) {
-      updateStateWithList([newItem, ...items]);
+    try {
+      const newItem = await service.add(data);
+      if (newItem) {
+        updateStateWithList([newItem, ...items]);
+        toast.success("Sikeresen hozzáadva!");
+      }
+    } catch (error) {
+      toast.error("Hozzáadás sikertelen!");
+      throw error;
     }
   };
 
   const handleUpdateItem = async (data) => {
-    const updatedItem = await service.update(data);
-    if (updatedItem) {
-      const updatedList = items.map((item) =>
-        item.id === updatedItem.id ? updatedItem : item
-      );
-      updateStateWithList(updatedList);
+    try {
+      const updatedItem = await service.update(data);
+      if (updatedItem) {
+        const updatedList = items.map((item) =>
+          item.id === updatedItem.id ? updatedItem : item
+        );
+        updateStateWithList(updatedList);
+        toast.success("Sikeresen módosítva!");
+      }
+      setEditingId(null);
+    } catch (error) {
+      toast.error("Módosítás sikertelen!");
+      throw error;
     }
-    setEditingId(null);
   };
 
   const handleDeleteItem = async (id) => {
-    await service.delete(id);
-    await fetchItems();
+    try {
+      await service.delete(id);
+      toast.success("Sikeresen törölve!");
+      await fetchItems();
+    } catch (error) {
+      toast.error("Törlés sikertelen!");
+    }
   };
 
   const handleStartEdit = (item) => {

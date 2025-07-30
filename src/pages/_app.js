@@ -1,6 +1,7 @@
 import { createGlobalStyle } from "styled-components";
 import Head from "next/head";
 import { BackButton } from "@/components/BackButton";
+import { Toaster } from "react-hot-toast";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -75,6 +76,17 @@ function MyApp({ Component, pageProps }) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          style: {
+            background: '#1f2937',
+            color: '#e5e7eb',
+            border: '1px solid #4b5563',
+          },
+        }}
+      />
       
       <GlobalStyle />
       <BackButton />
