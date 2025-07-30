@@ -38,30 +38,27 @@ export function ConsumptionChart({ data }) {
       .filter(Boolean);
   }, [data]);
 
-  // Dinamikusan kiszámoljuk az intervalt, hogy kb. 10 címke jelenjen meg
   const tickInterval =
     chartData.length > 10 ? Math.floor(chartData.length / 10) : 0;
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      {/* --- ITT AZ 1. JAVÍTÁS: MARGÓ HOZZÁADÁSA --- */}
       <LineChart
         data={chartData}
         margin={{
           top: 5,
           right: 20,
           left: 10,
-          bottom: 20, // A legfontosabb a bal és alsó margó
+          bottom: 20,
         }}
       >
         <CartesianGrid stroke="#374151" strokeDasharray="3 3" />
-        {/* --- ITT A 2. JAVÍTÁS: INTERVAL HOZZÁADÁSA --- */}
         <XAxis
           dataKey="date"
           stroke="#9ca3af"
           interval={tickInterval}
-          angle={-30} // Enyhén megdöntjük a címkéket
-          textAnchor="end" // A döntés miatt az igazítást is beállítjuk
+          angle={-30}
+          textAnchor="end"
         />
         <YAxis
           stroke="#9ca3af"

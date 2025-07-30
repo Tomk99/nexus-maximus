@@ -40,7 +40,6 @@ export function InvestmentForm({
     }
   }, [editingSnapshot]);
 
-  // --- ITT A JAVÍTÁS: A hiányzó függvény visszaállítása ---
   const handleValueChange = (assetId, value) => {
     setValues((prev) => ({ ...prev, [assetId]: value }));
   };

@@ -22,7 +22,6 @@ export function MaintenanceForm({
   onUpdate,
   editingMaintenance,
   onCancelEdit,
-  // --- ÚJ PROPOK ---
   onCalendarOpen,
   onCalendarClose,
 }) {
@@ -81,8 +80,8 @@ export function MaintenanceForm({
             customInput={<Input />}
             popperPlacement="bottom-start"
             locale="hu"
-            onCalendarOpen={onCalendarOpen} // <-- ITT A JAVÍTÁS
-            onCalendarClose={onCalendarClose} // <-- ITT A JAVÍTÁS
+            onCalendarOpen={onCalendarOpen}
+            onCalendarClose={onCalendarClose}
           />
         </DatePickerWrapper>
       </FormGroup>

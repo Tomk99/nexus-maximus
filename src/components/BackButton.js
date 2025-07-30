@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react"; // A useState importálása
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styled from "styled-components";
@@ -51,21 +51,17 @@ const ArrowIcon = () => (
 );
 
 export function BackButton() {
-  // --- ITT A JAVÍTÁS ---
   const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
 
-  // Ez a hook csak a kliensoldalon fut le, miután a komponens betöltődött.
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Amíg a komponens nincs "mountolva" (vagy a szerveren vagyunk), semmit nem jelenítünk meg.
   if (!isMounted) {
     return null;
   }
 
-  // Ha már a kliensen vagyunk, és nem a főoldalon, akkor jelenítjük meg a gombot.
   if (pathname === "/") {
     return null;
   }

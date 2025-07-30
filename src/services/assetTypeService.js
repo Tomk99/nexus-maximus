@@ -9,7 +9,6 @@ const handleResponse = async (response) => {
   return response.json();
 };
 
-// Ez a függvény egy service objektumot ad vissza a megadott worksheetId-hoz
 export const getAssetTypeService = (worksheetId) => {
   if (!worksheetId) return null;
 

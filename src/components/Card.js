@@ -7,9 +7,6 @@ export const Card = styled.div`
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2);
-  
-  /* --- ITT A JAVÍTÁS --- */
-  position: relative; /* Szükséges a z-index működéséhez */
-  /* Ha az $isActive prop igaz, megemeljük a kártyát */
+  position: relative;
   z-index: ${(props) => (props.$isActive ? 50 : "auto")};
 `;

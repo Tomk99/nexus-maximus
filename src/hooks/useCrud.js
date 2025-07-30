@@ -13,7 +13,6 @@ export const useCrud = (service) => {
       }
       setItems(list);
     } else {
-      // Ha a service nem listát ad vissza, ne csináljunk semmit, vagy logoljuk
       console.warn("updateStateWithList did not receive an array:", list);
     }
   }, []);
@@ -48,15 +47,12 @@ export const useCrud = (service) => {
 
   const handleUpdateItem = async (data) => {
     const updatedList = await service.update(data);
-    // A backend általában a frissített elemet adja vissza, nem a teljes listát.
-    // Ezért a biztonság kedvéért újra lekérjük a teljes listát.
     await fetchItems();
     setEditingId(null);
   };
 
   const handleDeleteItem = async (id) => {
     await service.delete(id);
-    // Törlés után a lista biztosan megváltozott, ezért újra lekérjük.
     await fetchItems();
   };
 

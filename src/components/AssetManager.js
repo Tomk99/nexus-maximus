@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react"; // Itt a javítás
+import { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import styled from "styled-components";
 import {

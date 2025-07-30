@@ -44,7 +44,6 @@ export default function HomePage() {
     setIsMounted(true);
   }, []);
 
-  // A hydration hibák elkerülése érdekében csak akkor renderelünk, ha a kliensoldalon vagyunk.
   if (!isMounted) {
     return null;
   }
