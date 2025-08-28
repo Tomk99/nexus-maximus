@@ -31,10 +31,7 @@ export default class MyDocument extends Document {
   render() {
     return (
       <Html lang="hu">
-        <Head>
-          <link rel="manifest" href="/manifest.json" />
-          <meta name="theme-color" content="#111827" />
-        </Head>
+        <Head />
         <body>
           <Main />
           <NextScript />

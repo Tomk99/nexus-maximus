@@ -75,6 +75,8 @@ function MyApp({ Component, pageProps }) {
           content="Személyes menedzsment alkalmazás"
         />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#111827" />
       </Head>
       
       <Toaster
