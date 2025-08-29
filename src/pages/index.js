@@ -15,6 +15,7 @@ const ModuleGrid = styled.div`
 const ModuleLink = styled(Link)`
   text-decoration: none;
   color: inherit;
+  display: block; // Fontos, hogy a link kitöltse a grid cellát
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
   &:hover {
@@ -67,6 +68,16 @@ export default function HomePage() {
               <ModuleTitle>📈 Befektetés Követő</ModuleTitle>
               <ModuleDescription>
                 Portfóliód értékének vizualizálása és nyomon követése.
+              </ModuleDescription>
+            </Card>
+          </ModuleLink>
+
+          {/* --- EZ AZ ÚJ RÉSZ --- */}
+          <ModuleLink href="/inventory">
+            <Card>
+              <ModuleTitle>📦 Leltár Kezelő</ModuleTitle>
+              <ModuleDescription>
+                Dobozok és tartalmuk nyilvántartása QR kódokkal.
               </ModuleDescription>
             </Card>
           </ModuleLink>
