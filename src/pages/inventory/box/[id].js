@@ -9,6 +9,7 @@ import {
   ListItem,
   Badge,
   ActionButtons,
+  ActionButton,
   Description,
 } from "@/components/ListElements";
 import {
@@ -17,6 +18,7 @@ import {
   Label,
   Input,
   PrimaryButton,
+  SecondaryButton,
 } from "@/components/FormElements";
 import styled from "styled-components";
 import toast from "react-hot-toast";
@@ -36,6 +38,7 @@ export default function BoxDetailPage() {
   const { id } = router.query;
   const [box, setBox] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [editingItem, setEditingItem] = useState(null);
   const [itemName, setItemName] = useState("");
   const [itemQuantity, setItemQuantity] = useState(1);
 
@@ -59,33 +62,61 @@ export default function BoxDetailPage() {
     fetchBoxDetails();
   }, [fetchBoxDetails]);
 
-  const handleAddItem = async (e) => {
+  const handleItemSubmit = async (e) => {
     e.preventDefault();
     if (!itemName) {
       alert("A tárgy nevének megadása kötelező!");
       return;
     }
+
+    const itemData = { name: itemName, quantity: itemQuantity };
+
     try {
-      await inventoryService.addItemToBox(id, {
-        name: itemName,
-        quantity: itemQuantity,
-      });
-      toast.success("Tárgy sikeresen hozzáadva!");
-      setItemName("");
-      setItemQuantity(1);
+      if (editingItem) {
+        await inventoryService.updateItem({ ...itemData, id: editingItem.id });
+        toast.success("Tárgy sikeresen módosítva!");
+      } else {
+        await inventoryService.addItemToBox(id, itemData);
+        toast.success("Tárgy sikeresen hozzáadva!");
+      }
+      resetFormAndState();
       fetchBoxDetails();
     } catch (error) {
-      toast.error("Hiba történt a tárgy hozzáadásakor.");
+      toast.error("Hiba történt a művelet során.");
       console.error(error);
     }
   };
 
-  if (isLoading) {
-    return <p style={{ textAlign: "center", padding: "40px" }}>Töltés...</p>;
-  }
-  if (!box) {
-    return <p style={{ textAlign: "center", padding: "40px" }}>Doboz nem található.</p>;
-  }
+  const handleDeleteItem = async (itemId) => {
+    if (window.confirm("Biztosan törlöd ezt a tárgyat?")) {
+      try {
+        await inventoryService.deleteItem(itemId);
+        toast.success("Tárgy sikeresen törölve!");
+        fetchBoxDetails();
+      } catch (error) {
+        toast.error("Hiba történt a törlés során.");
+        console.error(error);
+      }
+    }
+  };
+
+  const handleStartEdit = (item) => {
+    setEditingItem(item);
+    setItemName(item.name);
+    setItemQuantity(item.quantity);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const resetFormAndState = () => {
+    setEditingItem(null);
+    setItemName("");
+    setItemQuantity(1);
+  };
+
+  if (isLoading) return <p style={{ textAlign: "center", padding: "40px" }}>Töltés...</p>;
+  if (!box) return <p style={{ textAlign: "center", padding: "40px" }}>Doboz nem található.</p>;
+
+  const isEditing = !!editingItem;
 
   return (
     <main style={{ padding: "32px" }}>
@@ -104,8 +135,10 @@ export default function BoxDetailPage() {
               />
             </Card>
             <Card>
-              <FormContainer onSubmit={handleAddItem}>
-                <h2 style={{ color: "white" }}>Új tárgy hozzáadása</h2>
+              <FormContainer onSubmit={handleItemSubmit}>
+                <h2 style={{ color: "white" }}>
+                  {isEditing ? "Tárgy szerkesztése" : "Új tárgy hozzáadása"}
+                </h2>
                 <FormGroup>
                   <Label htmlFor="item-name">Tárgy neve</Label>
                   <Input
@@ -125,7 +158,16 @@ export default function BoxDetailPage() {
                     onChange={(e) => setItemQuantity(parseInt(e.target.value))}
                   />
                 </FormGroup>
-                <PrimaryButton type="submit">Tárgy hozzáadása</PrimaryButton>
+                <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
+                  <PrimaryButton type="submit">
+                    {isEditing ? "Módosítás mentése" : "Tárgy hozzáadása"}
+                  </PrimaryButton>
+                  {isEditing && (
+                    <SecondaryButton type="button" onClick={resetFormAndState}>
+                      Mégse
+                    </SecondaryButton>
+                  )}
+                </div>
               </FormContainer>
             </Card>
           </Column>
@@ -139,6 +181,12 @@ export default function BoxDetailPage() {
                       <Description>{item.name}</Description>
                       <ActionButtons>
                         <Badge>{item.quantity} db</Badge>
+                        <ActionButton onClick={() => handleStartEdit(item)}>
+                          Szerkeszt
+                        </ActionButton>
+                        <ActionButton onClick={() => handleDeleteItem(item.id)}>
+                          Töröl
+                        </ActionButton>
                       </ActionButtons>
                     </ListItem>
                   ))}
