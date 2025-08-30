@@ -39,4 +39,7 @@ export const inventoryService = {
       body: JSON.stringify(itemData),
     }).then(handleResponse);
   },
+  searchBoxes: (itemName) => {
+    return fetch(`${API_URL}/inventory/boxes/search?itemName=${encodeURIComponent(itemName)}`).then(handleResponse);
+  },
 };

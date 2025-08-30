@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useCrud } from "@/hooks/useCrud";
-import { boxService } from "@/services/inventoryService";
+import { inventoryService, boxService } from "@/services/inventoryService";
 import { Container, Title, Grid, Column } from "@/components/Layout";
 import { Card } from "@/components/Card";
 import {
@@ -58,26 +57,75 @@ const BoxContent = styled.div`
   }
 `;
 
-export default function InventoryPage() {
-  const {
-    items: boxes,
-    handleAddItem: handleAddBox,
-    handleUpdateItem: handleUpdateBox,
-    handleDeleteItem: handleDeleteBox,
-    isLoading,
-  } = useCrud(boxService);
+const SearchContainer = styled(Card)`
+  margin-bottom: 24px;
+`;
 
+const MatchList = styled.ul`
+  list-style: none;
+  padding: 10px 0 0 0;
+  margin: 10px 0 0 0;
+  border-top: 1px solid #374151;
+  font-size: 14px;
+
+  li {
+    color: #9ca3af;
+    &:not(:last-child) {
+      margin-bottom: 4px;
+    }
+    &::before {
+      content: '✓ ';
+      color: #34d399;
+    }
+  }
+`;
+
+export default function InventoryPage() {
+  const [boxes, setBoxes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [showScanner, setShowScanner] = useState(false);
   const [editingBox, setEditingBox] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const fetchBoxes = async (term = "") => {
+    setIsLoading(true);
+    try {
+      const data = await inventoryService.searchBoxes(term);
+      setBoxes(data);
+    } catch (error) {
+      toast.error("Dobozok betöltése sikertelen.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBoxes();
+  }, []);
+
+  const handleAddBox = async (boxData) => {
+    await boxService.add(boxData);
+    toast.success("Doboz sikeresen létrehozva!");
+    fetchBoxes(searchTerm);
+  };
+
+  const handleUpdateBox = async (boxData) => {
+    await boxService.update(boxData);
+    toast.success("Doboz sikeresen módosítva!");
+    fetchBoxes(searchTerm);
+  };
+
+  const handleDeleteBox = async (boxId) => {
+    await boxService.delete(boxId);
+    toast.success("Doboz sikeresen törölve!");
+    fetchBoxes(searchTerm);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name) {
-      alert("A doboz nevének megadása kötelező!");
-      return;
-    }
+    if (!name) return;
     await handleAddBox({ name, description });
     setName("");
     setDescription("");
@@ -91,31 +139,22 @@ export default function InventoryPage() {
   const handleDelete = (e, boxId) => {
     e.preventDefault();
     e.stopPropagation();
-    if (window.confirm("Biztosan törlöd ezt a dobozt és a teljes tartalmát?")) {
+    if (window.confirm("Biztosan törlöd ezt a dobozt?")) {
       handleDeleteBox(boxId);
     }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchBoxes(searchTerm);
   };
 
   return (
     <main style={{ padding: "32px" }}>
       <Container>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "32px",
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "center", marginBottom: "32px" }}>
           <Title style={{ marginBottom: 0 }}>Leltár - Dobozok</Title>
-          <PrimaryButton
-            onClick={() => setShowScanner(true)}
-            style={{
-              padding: "8px 16px",
-              fontSize: "14px",
-              maxWidth: "150px",
-            }}
-          >
+          <PrimaryButton onClick={() => setShowScanner(true)} style={{ marginLeft: "auto", padding: "8px 16px", fontSize: "14px", width: "fit-content", maxWidth: "150px" }}>
             QR Kód Beolvasása
           </PrimaryButton>
         </div>
@@ -124,32 +163,14 @@ export default function InventoryPage() {
           <Column $span={1}>
             <Card>
               <FormContainer onSubmit={handleSubmit}>
-                <h2
-                  style={{
-                    color: "white",
-                    fontSize: "24px",
-                    fontWeight: 600,
-                  }}
-                >
-                  Új doboz
-                </h2>
+                <h2 style={{ color: "white", fontSize: "24px", fontWeight: 600 }}>Új doboz</h2>
                 <FormGroup>
                   <Label htmlFor="box-name">Doboz neve</Label>
-                  <Input
-                    id="box-name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="pl. Konyhai eszközök"
-                  />
+                  <Input id="box-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="pl. Konyhai eszközök" />
                 </FormGroup>
                 <FormGroup>
                   <Label htmlFor="box-desc">Leírás (opcionális)</Label>
-                  <TextArea
-                    id="box-desc"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="pl. Törékeny porcelánok"
-                  />
+                  <TextArea id="box-desc" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="pl. Törékeny porcelánok" />
                 </FormGroup>
                 <PrimaryButton type="submit">Hozzáadás</PrimaryButton>
               </FormContainer>
@@ -157,15 +178,17 @@ export default function InventoryPage() {
           </Column>
 
           <Column $span={2}>
+            <SearchContainer>
+              <form onSubmit={handleSearch} style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <Input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Tárgy keresése..." style={{ flexGrow: 1 }} />
+                <PrimaryButton type="submit">Keresés</PrimaryButton>
+              </form>
+            </SearchContainer>
             <BoxGrid>
               {isLoading && <p>Dobozok betöltése...</p>}
-
               {!isLoading && boxes.length === 0 && (
-                <Card>
-                  <p>Még nincsenek dobozok. Hozz létre egyet!</p>
-                </Card>
+                <Card><p>{searchTerm ? "Nincs a keresésnek megfelelő doboz." : "Még nincsenek dobozok."}</p></Card>
               )}
-
               {boxes.map((box) => (
                 <BoxCard key={box.id}>
                   <Link href={`/inventory/box/${box.id}`} passHref legacyBehavior>
@@ -173,22 +196,19 @@ export default function InventoryPage() {
                       <BoxContent>
                         <h3>{box.name}</h3>
                         <p>{box.description || "Nincs leírás."}</p>
+                        {box.matchingItems && box.matchingItems.length > 0 && (
+                          <MatchList>
+                            {box.matchingItems.map((item, index) => (
+                              <li key={index}>{item}</li>
+                            ))}
+                          </MatchList>
+                        )}
                       </BoxContent>
                     </BoxLink>
                   </Link>
-                  <ActionButtons
-                    style={{
-                      marginTop: "16px",
-                      borderTop: "1px solid #374151",
-                      paddingTop: "16px",
-                    }}
-                  >
-                    <ActionButton onClick={() => setEditingBox(box)}>
-                      Szerkeszt
-                    </ActionButton>
-                    <ActionButton onClick={(e) => handleDelete(e, box.id)}>
-                      Töröl
-                    </ActionButton>
+                  <ActionButtons style={{ marginTop: "16px", borderTop: "1px solid #374151", paddingTop: "16px" }}>
+                    <ActionButton onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingBox(box); }}>Szerkeszt</ActionButton>
+                    <ActionButton onClick={(e) => handleDelete(e, box.id)}>Töröl</ActionButton>
                   </ActionButtons>
                 </BoxCard>
               ))}
@@ -199,30 +219,12 @@ export default function InventoryPage() {
 
       <Modal isOpen={showScanner} onClose={() => setShowScanner(false)}>
         <h2 style={{ textAlign: "center", color: "white" }}>QR Kód Scanner</h2>
-        <p
-          style={{
-            textAlign: "center",
-            color: "#9ca3af",
-            marginTop: "-10px",
-            marginBottom: "20px",
-          }}
-        >
-          Irányítsd a kamerát a dobozra ragasztott kódra.
-        </p>
-        {showScanner && (
-          <QrScanner
-            onScanSuccess={() => setShowScanner(false)}
-            onScanError={(errorMessage) => toast.error(errorMessage)}
-          />
-        )}
+        <p style={{ textAlign: "center", color: "#9ca3af", marginTop: "-10px", marginBottom: "20px" }}>Irányítsd a kamerát a dobozra ragasztott kódra.</p>
+        {showScanner && <QrScanner onScanSuccess={() => setShowScanner(false)} onScanError={(errorMessage) => toast.error(errorMessage)} />}
       </Modal>
 
       <Modal isOpen={!!editingBox} onClose={() => setEditingBox(null)}>
-        <BoxEditForm
-          box={editingBox}
-          onUpdate={handleUpdateAndClose}
-          onCancel={() => setEditingBox(null)}
-        />
+        <BoxEditForm box={editingBox} onUpdate={handleUpdateAndClose} onCancel={() => setEditingBox(null)} />
       </Modal>
     </main>
   );
