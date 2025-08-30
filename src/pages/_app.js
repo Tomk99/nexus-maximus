@@ -1,5 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { BackButton } from "@/components/BackButton";
 import { Toaster } from "react-hot-toast";
 
@@ -13,11 +14,9 @@ const GlobalStyle = createGlobalStyle`
     background-color: #111827;
     color: #e5e7eb;
   }
-
   * {
     box-sizing: border-box;
   }
-
   .react-datepicker {
     font-family: inherit;
     font-size: 0.8rem;
@@ -63,9 +62,25 @@ const GlobalStyle = createGlobalStyle`
   .react-datepicker__triangle::after {
     border-bottom-color: #1f2937 !important;
   }
+
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    .printable-content, .printable-content * {
+      visibility: visible;
+    }
+    .printable-content {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+  }
 `;
 
 function MyApp({ Component, pageProps }) {
+  const router = useRouter();
+
   return (
     <>
       <Head>
@@ -91,7 +106,9 @@ function MyApp({ Component, pageProps }) {
       />
       
       <GlobalStyle />
-      <BackButton />
+      
+      {router.pathname !== "/" && <BackButton />}
+      
       <Component {...pageProps} />
     </>
   );

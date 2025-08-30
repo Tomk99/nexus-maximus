@@ -22,6 +22,7 @@ import {
 } from "@/components/FormElements";
 import styled from "styled-components";
 import toast from "react-hot-toast";
+import { PrintableLabel } from "@/components/PrintableLabel";
 
 const QrCodeImage = styled.img`
   width: 200px;
@@ -38,6 +39,7 @@ export default function BoxDetailPage() {
   const { id } = router.query;
   const [box, setBox] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
   const [editingItem, setEditingItem] = useState(null);
   const [itemName, setItemName] = useState("");
   const [itemQuantity, setItemQuantity] = useState(1);
@@ -113,91 +115,104 @@ export default function BoxDetailPage() {
     setItemQuantity(1);
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (isLoading) return <p style={{ textAlign: "center", padding: "40px" }}>Töltés...</p>;
   if (!box) return <p style={{ textAlign: "center", padding: "40px" }}>Doboz nem található.</p>;
 
   const isEditing = !!editingItem;
 
   return (
-    <main style={{ padding: "32px" }}>
-      <Container>
-        <Title>{box.name}</Title>
-        <p style={{ marginTop: "-20px", marginBottom: "32px", color: "#9ca3af" }}>
-          {box.description}
-        </p>
-        <Grid>
-          <Column $span={1}>
-            <Card>
-              <h2 style={{ color: "white", textAlign: "center" }}>QR Kód</h2>
-              <QrCodeImage
-                src={`${API_URL}/inventory/boxes/${id}/qrcode`}
-                alt={`QR kód a(z) ${box.name} dobozhoz`}
-              />
-            </Card>
-            <Card>
-              <FormContainer onSubmit={handleItemSubmit}>
-                <h2 style={{ color: "white" }}>
-                  {isEditing ? "Tárgy szerkesztése" : "Új tárgy hozzáadása"}
-                </h2>
-                <FormGroup>
-                  <Label htmlFor="item-name">Tárgy neve</Label>
-                  <Input
-                    id="item-name"
-                    value={itemName}
-                    onChange={(e) => setItemName(e.target.value)}
-                    placeholder="pl. Porcelán tányér"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label htmlFor="item-qty">Mennyiség</Label>
-                  <Input
-                    id="item-qty"
-                    type="number"
-                    min="1"
-                    value={itemQuantity}
-                    onChange={(e) => setItemQuantity(parseInt(e.target.value))}
-                  />
-                </FormGroup>
-                <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
-                  <PrimaryButton type="submit">
-                    {isEditing ? "Módosítás mentése" : "Tárgy hozzáadása"}
-                  </PrimaryButton>
-                  {isEditing && (
-                    <SecondaryButton type="button" onClick={resetFormAndState}>
-                      Mégse
-                    </SecondaryButton>
-                  )}
-                </div>
-              </FormContainer>
-            </Card>
-          </Column>
-          <Column $span={2}>
-            <Card>
-              <h2 style={{ color: "white" }}>Doboz tartalma</h2>
-              {box.items && box.items.length > 0 ? (
-                <List>
-                  {box.items.map((item) => (
-                    <ListItem key={item.id}>
-                      <Description>{item.name}</Description>
-                      <ActionButtons>
-                        <Badge>{item.quantity} db</Badge>
-                        <ActionButton onClick={() => handleStartEdit(item)}>
-                          Szerkeszt
-                        </ActionButton>
-                        <ActionButton onClick={() => handleDeleteItem(item.id)}>
-                          Töröl
-                        </ActionButton>
-                      </ActionButtons>
-                    </ListItem>
-                  ))}
-                </List>
-              ) : (
-                <p style={{ color: "#9ca3af" }}>Ez a doboz még üres. Adj hozzá tárgyakat!</p>
-              )}
-            </Card>
-          </Column>
-        </Grid>
-      </Container>
-    </main>
+    <>
+      <main style={{ padding: "32px" }}>
+        <Container>
+          <Title>{box.name}</Title>
+          <p style={{ marginTop: "-20px", marginBottom: "32px", color: "#9ca3af" }}>
+            {box.description}
+          </p>
+          <Grid>
+            <Column $span={1}>
+              <Card>
+                <h2 style={{ color: "white", textAlign: "center" }}>QR Kód</h2>
+                <h3 style={{ color: "#9ca3af", textAlign: "center", marginTop: "-10px", marginBottom: "20px" }}>
+                  Azonosító: #{box.id}
+                </h3>
+                <QrCodeImage
+                  src={`${API_URL}/inventory/boxes/${id}/qrcode`}
+                  alt={`QR kód a(z) ${box.name} dobozhoz`}
+                />
+                <PrimaryButton onClick={handlePrint} style={{ width: '100%', marginTop: '20px' }}>
+                  Matrica Nyomtatása
+                </PrimaryButton>
+              </Card>
+              <Card>
+                <FormContainer onSubmit={handleItemSubmit}>
+                  <h2 style={{ color: "white" }}>
+                    {isEditing ? "Tárgy szerkesztése" : "Új tárgy hozzáadása"}
+                  </h2>
+                  <FormGroup>
+                    <Label htmlFor="item-name">Tárgy neve</Label>
+                    <Input
+                      id="item-name"
+                      value={itemName}
+                      onChange={(e) => setItemName(e.target.value)}
+                      placeholder="pl. Porcelán tányér"
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="item-qty">Mennyiség</Label>
+                    <Input
+                      id="item-qty"
+                      type="number"
+                      min="1"
+                      value={itemQuantity}
+                      onChange={(e) => setItemQuantity(parseInt(e.target.value))}
+                    />
+                  </FormGroup>
+                  <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
+                    <PrimaryButton type="submit">
+                      {isEditing ? "Módosítás mentése" : "Tárgy hozzáadása"}
+                    </PrimaryButton>
+                    {isEditing && (
+                      <SecondaryButton type="button" onClick={resetFormAndState}>
+                        Mégse
+                      </SecondaryButton>
+                    )}
+                  </div>
+                </FormContainer>
+              </Card>
+            </Column>
+            <Column $span={2}>
+              <Card>
+                <h2 style={{ color: "white" }}>Doboz tartalma</h2>
+                {box.items && box.items.length > 0 ? (
+                  <List>
+                    {box.items.map((item) => (
+                      <ListItem key={item.id}>
+                        <Description>{item.name}</Description>
+                        <ActionButtons>
+                          <Badge>{item.quantity} db</Badge>
+                          <ActionButton onClick={() => handleStartEdit(item)}>
+                            Szerkeszt
+                          </ActionButton>
+                          <ActionButton onClick={() => handleDeleteItem(item.id)}>
+                            Töröl
+                          </ActionButton>
+                        </ActionButtons>
+                      </ListItem>
+                    ))}
+                  </List>
+                ) : (
+                  <p style={{ color: "#9ca3af" }}>Ez a doboz még üres. Adj hozzá tárgyakat!</p>
+                )}
+              </Card>
+            </Column>
+          </Grid>
+        </Container>
+      </main>
+      <PrintableLabel box={box} />
+    </>
   );
 }
