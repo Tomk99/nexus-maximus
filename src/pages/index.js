@@ -13,9 +13,11 @@ const ModuleGrid = styled.div`
 `;
 
 const ModuleLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-  display: block; // Fontos, hogy a link kitöltse a grid cellát
+  /* --- JAVÍTÁSOK --- */
+  text-decoration: none; /* Eltávolítja a link aláhúzását */
+  color: inherit;       /* A szöveg színe öröklődik, így nem lesz kék */
+  
+  display: block;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
   &:hover {
@@ -55,7 +57,7 @@ export default function HomePage() {
         <Title>Nexus Maximus</Title>
         <ModuleGrid>
           <ModuleLink href="/car">
-            <Card>
+            <Card style={{ height: '100%' }}>
               <ModuleTitle>🚗 Autó Nyilvántartó</ModuleTitle>
               <ModuleDescription>
                 Tankolások, fogyasztás és karbantartások követése egy helyen.
@@ -64,7 +66,7 @@ export default function HomePage() {
           </ModuleLink>
 
           <ModuleLink href="/investments">
-            <Card>
+            <Card style={{ height: '100%' }}>
               <ModuleTitle>📈 Befektetés Követő</ModuleTitle>
               <ModuleDescription>
                 Portfóliód értékének vizualizálása és nyomon követése.
@@ -72,9 +74,8 @@ export default function HomePage() {
             </Card>
           </ModuleLink>
 
-          {/* --- EZ AZ ÚJ RÉSZ --- */}
           <ModuleLink href="/inventory">
-            <Card>
+            <Card style={{ height: '100%' }}>
               <ModuleTitle>📦 Leltár Kezelő</ModuleTitle>
               <ModuleDescription>
                 Dobozok és tartalmuk nyilvántartása QR kódokkal.
